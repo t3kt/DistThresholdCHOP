@@ -21,8 +21,8 @@ If no input is connected then the node will output a smooth sine wave at 120hz.
 class DistThresholdCHOP : public CHOP_CPlusPlusBase
 {
 public:
-	DistThresholdCHOP(const CHOP_NodeInfo *info);
-	virtual ~DistThresholdCHOP();
+	DistThresholdCHOP(const CHOP_NodeInfo *info) { }
+	virtual ~DistThresholdCHOP() { }
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo *);
 	virtual bool		getOutputInfo(CHOP_OutputInfo*);
@@ -31,28 +31,7 @@ public:
 	virtual void		execute(const CHOP_Output*,
 								const CHOP_InputArrays*,
 								void* reserved);
-
-
-	virtual int			getNumInfoCHOPChans();
-	virtual void		getInfoCHOPChan(int index,
-										CHOP_InfoCHOPChan *chan);
-
-	virtual bool		getInfoDATSize(CHOP_InfoDATSize *infoSize);
-	virtual void		getInfoDATEntries(int index,
-											int nEntries,
-											CHOP_InfoDATEntries *entries);
 private:
-
-	// We don't need to store this pointer, but we do for the example.
-	// The CHOP_NodeInfo class store information about the node that's using
-	// this instance of the class (like its name).
-	const CHOP_NodeInfo		*myNodeInfo;
-
-	// In this example this value will be incremented each time the execute()
-	// function is called, then passes back to the CHOP 
-	int						 myExecuteCount;
-
-
 	float** linepos;
 
 	int l;
