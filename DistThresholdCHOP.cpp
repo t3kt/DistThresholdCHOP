@@ -223,7 +223,7 @@ DistThresholdCHOP::getInfoCHOPChan(int index,
 	if (index == 0)
 	{
 		chan->name = "executeCount";
-		chan->value = myExecuteCount;
+		chan->value = (float)myExecuteCount;
 	}
 }
 
