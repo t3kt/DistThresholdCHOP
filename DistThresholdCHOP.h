@@ -18,6 +18,12 @@ enum
 	IN_Y,
 	IN_Z
 };
+enum
+{
+	PT_X,
+	PT_Y,
+	PT_Z
+};
 
 enum
 {
