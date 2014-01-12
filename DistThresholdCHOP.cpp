@@ -44,75 +44,7 @@ void DistThresholdCHOP::getGeneralInfo(CHOP_GeneralInfo *ginfo)
 	ginfo->inputMatchIndex = 0;
 }
 
-inline float squareDist( float p1[3], float p2[3] )
-{
-	return pow(p2[0]-p1[0],2) + pow(p2[1]-p1[1],2) + pow(p2[2]-p1[2],2);
-}
-
-bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
-{
-	int maxLines = (int)info->inputArrays->floatInputs[1].values[0];
-
-	info->numChannels = NUM_OUTS;
-
-	linepos = (float**)malloc(info->numChannels*sizeof(float*));
-	for (int i = 0; i < NUM_OUTS; i++)
-	{
-		linepos[i] = (float*)malloc(maxLines*sizeof(float));
-	}
-
-	l = 0;
-
-	if (info->inputArrays->numCHOPInputs > 0)
-	{
-		const CHOP_CHOPInput input0 = info->inputArrays->CHOPInputs[0];
-		int input0len = input0.length;
-		for (int i = 0; i < input0len && l < maxLines; i++)
-		{
-			float p1[] = {
-				input0.channels[IN_X][i],
-				input0.channels[IN_Y][i],
-				input0.channels[IN_Z][i]
-			};
-
-			for (int j = i+1; j < input0len && l < maxLines; j++)
-			{
-				float p2[] = {
-					input0.channels[IN_X][j],
-					input0.channels[IN_Y][j],
-					input0.channels[IN_Z][j]
-				};
-
-				float sqrdist = squareDist(p1, p2);
-				float distMax = info->inputArrays->floatInputs[0].values[0];
-				//float fade = info->inputArrays->floatInputs[0].values[1];
-				if (sqrdist<distMax)
-				{
-					linepos[OUT_TX1][l] = p1[0];
-					linepos[OUT_TY1][l] = p1[1];
-					linepos[OUT_TZ1][l] = p1[2];
-					linepos[OUT_TX2][l] = p2[0];
-					linepos[OUT_TY2][l] = p2[1];
-					linepos[OUT_TZ2][l] = p2[2];
-					linepos[OUT_SQRDIST][l] = sqrdist;
-					l++;
-				}
-			}
-		}
-	} else {
-		for (int i = 0 ; i < info->numChannels; i++)
-		{
-			free(linepos[i]);
-		}
-	}
-
-	if(l<1) l=1;
-	info->length = l;
-	return true;
-}
-
-const char*
-	DistThresholdCHOP::getChannelName(int index, void* reserved)
+const char* DistThresholdCHOP::getChannelName(int index, void* reserved)
 {
 	const char* name = "";
 
@@ -143,13 +75,119 @@ const char*
 	return name;
 }
 
+inline float squareDist( float p1[3], float p2[3] )
+{
+	return pow(p2[0]-p1[0],2) + pow(p2[1]-p1[1],2) + pow(p2[2]-p1[2],2);
+}
+
+bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
+{
+	int maxLines = (int)info->inputArrays->floatInputs[SETTING_MAXLINES].values[0];
+	float distMax = info->inputArrays->floatInputs[SETTING_DISTMAX].values[0];
+	//float fade = info->inputArrays->floatInputs[0].values[1];
+
+	info->numChannels = NUM_OUTS;
+
+	linepos = (float**)malloc(NUM_OUTS*sizeof(float*));
+	for (int i = 0; i < NUM_OUTS; i++)
+	{
+		linepos[i] = (float*)malloc(maxLines*sizeof(float));
+	}
+
+	numlines = 0;
+
+	const CHOP_CHOPInput input0 = info->inputArrays->CHOPInputs[0];
+	int input0len = input0.length;
+	if (info->inputArrays->numCHOPInputs >= 2)
+	{
+		int maxLinesPerSource = (int)info->inputArrays->floatInputs[SETTING_MAXLINESPERSOURCE].values[0];
+		const CHOP_CHOPInput input1 = info->inputArrays->CHOPInputs[1];
+		int input1len = input1.length;
+		for(int i = 0; i < input0len && numlines < maxLines; i++)
+		{
+			float p1[] = {
+				input0.channels[IN_X][i],
+				input0.channels[IN_Y][i],
+				input0.channels[IN_Z][i]
+			};
+
+			for(int j = 0; j < input1len; j++)
+			{
+				float p2[] = {
+					input1.channels[IN_X][j],
+					input1.channels[IN_Y][j],
+					input1.channels[IN_Z][j]
+				};
+				float sqrdist = squareDist(p1, p2);
+				if (sqrdist<distMax)
+				{
+					linepos[OUT_TX1][numlines] = p1[0];
+					linepos[OUT_TY1][numlines] = p1[1];
+					linepos[OUT_TZ1][numlines] = p1[2];
+					linepos[OUT_TX2][numlines] = p2[0];
+					linepos[OUT_TY2][numlines] = p2[1];
+					linepos[OUT_TZ2][numlines] = p2[2];
+					linepos[OUT_SQRDIST][numlines] = sqrdist;
+					numlines++;
+					if(numlines >= maxLinesPerSource)
+						break;
+				}
+			}
+		}
+	}
+	else if (info->inputArrays->numCHOPInputs == 1)
+	{
+		for (int i = 0; i < input0len && numlines < maxLines; i++)
+		{
+			float p1[] = {
+				input0.channels[IN_X][i],
+				input0.channels[IN_Y][i],
+				input0.channels[IN_Z][i]
+			};
+
+			for (int j = i+1; j < input0len; j++)
+			{
+				float p2[] = {
+					input0.channels[IN_X][j],
+					input0.channels[IN_Y][j],
+					input0.channels[IN_Z][j]
+				};
+
+				float sqrdist = squareDist(p1, p2);
+				if (sqrdist<distMax)
+				{
+					linepos[OUT_TX1][numlines] = p1[0];
+					linepos[OUT_TY1][numlines] = p1[1];
+					linepos[OUT_TZ1][numlines] = p1[2];
+					linepos[OUT_TX2][numlines] = p2[0];
+					linepos[OUT_TY2][numlines] = p2[1];
+					linepos[OUT_TZ2][numlines] = p2[2];
+					linepos[OUT_SQRDIST][numlines] = sqrdist;
+					numlines++;
+					if(numlines >= maxLines)
+						break;
+				}
+			}
+		}
+	} else {
+		for (int i = 0 ; i < info->numChannels; i++)
+		{
+			free(linepos[i]);
+		}
+	}
+
+	if(numlines<1) numlines=1;
+	info->length = numlines;
+	return true;
+}
+
 void DistThresholdCHOP::execute(const CHOP_Output* output, const CHOP_InputArrays* inputs, void* reserved)
 {
 	if (inputs->numCHOPInputs > 0)
 	{
 		for (int i = 0 ; i < output->numChannels; i++)
 		{
-			memcpy(output->channels[i], linepos[i], l*sizeof(float));
+			memcpy(output->channels[i], linepos[i], numlines*sizeof(float));
 
 			free(linepos[i]);
 		}

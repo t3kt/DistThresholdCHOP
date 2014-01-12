@@ -19,6 +19,13 @@ enum
 	IN_Z
 };
 
+enum
+{
+	SETTING_MAXLINES,
+	SETTING_DISTMAX,
+	SETTING_MAXLINESPERSOURCE
+};
+
 class DistThresholdCHOP : public CHOP_CPlusPlusBase
 {
 public:
@@ -35,5 +42,5 @@ public:
 private:
 	float** linepos;
 
-	int l;
+	int numlines;
 };
