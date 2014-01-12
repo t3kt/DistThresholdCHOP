@@ -1,22 +1,23 @@
 #include "CHOP_CPlusPlusBase.h"
 
-/*
+enum
+{
+	OUT_TX1,
+	OUT_TY1,
+	OUT_TZ1,
+	OUT_TX2,
+	OUT_TY2,
+	OUT_TZ2,
+	OUT_SQRDIST,
+	NUM_OUTS
+};
 
-This example file implements a class that does 2 different things depending on
-if a CHOP is connected to the CPlusPlus CHOPs input or not.
-The example is timesliced, which is the more complex way of working.
-
-If an input is connected the node will output the same number of channels as the
-input and divide the first 'N' samples in the input channel by 2. 'N' being the current
-timeslice size. This is noteworthy because if the input isn't changing then the output
-will look wierd since depending on the timeslice size some number of the first samples
-of the input will get used.
-
-If no input is connected then the node will output a smooth sine wave at 120hz.
-*/
-
-
-// To get more help about these functions, look at CHOP_CPlusPlusBase.h
+enum
+{
+	IN_X,
+	IN_Y,
+	IN_Z
+};
 
 class DistThresholdCHOP : public CHOP_CPlusPlusBase
 {
@@ -35,6 +36,4 @@ private:
 	float** linepos;
 
 	int l;
-
-
 };

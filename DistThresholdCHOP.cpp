@@ -44,17 +44,19 @@ void DistThresholdCHOP::getGeneralInfo(CHOP_GeneralInfo *ginfo)
 	ginfo->inputMatchIndex = 0;
 }
 
+inline float squareDist( float p1[3], float p2[3] )
+{
+	return pow(p2[0]-p1[0],2) + pow(p2[1]-p1[1],2) + pow(p2[2]-p1[2],2);
+}
+
 bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 {
-
-
 	int maxLines = (int)info->inputArrays->floatInputs[1].values[0];
 
-	info->numChannels = 7;
-
+	info->numChannels = NUM_OUTS;
 
 	linepos = (float**)malloc(info->numChannels*sizeof(float*));
-	for (int i = 0; i < info->numChannels; i++)
+	for (int i = 0; i < NUM_OUTS; i++)
 	{
 		linepos[i] = (float*)malloc(maxLines*sizeof(float));
 	}
@@ -63,39 +65,37 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 
 	if (info->inputArrays->numCHOPInputs > 0)
 	{
-		for (int i = 0; i < info->inputArrays->CHOPInputs[0].length; i++)
+		const CHOP_CHOPInput input0 = info->inputArrays->CHOPInputs[0];
+		int input0len = input0.length;
+		for (int i = 0; i < input0len && l < maxLines; i++)
 		{
-			if(l<maxLines)
+			float p1[] = {
+				input0.channels[IN_X][i],
+				input0.channels[IN_Y][i],
+				input0.channels[IN_Z][i]
+			};
+
+			for (int j = i+1; j < input0len && l < maxLines; j++)
 			{
-				float p1[] = {info->inputArrays->CHOPInputs[0].channels[0][i],
-					info->inputArrays->CHOPInputs[0].channels[1][i],
-					info->inputArrays->CHOPInputs[0].channels[2][i]};
+				float p2[] = {
+					input0.channels[IN_X][j],
+					input0.channels[IN_Y][j],
+					input0.channels[IN_Z][j]
+				};
 
-				for (int j = i+1; j < info->inputArrays->CHOPInputs[0].length; j++)
+				float sqrdist = squareDist(p1, p2);
+				float distMax = info->inputArrays->floatInputs[0].values[0];
+				//float fade = info->inputArrays->floatInputs[0].values[1];
+				if (sqrdist<distMax)
 				{
-					if(l<maxLines)
-					{
-						float p2[] = {info->inputArrays->CHOPInputs[0].channels[0][j],
-							info->inputArrays->CHOPInputs[0].channels[1][j],
-							info->inputArrays->CHOPInputs[0].channels[2][j]};
-
-						float sqrdist = pow(p2[0]-p1[0],2) + pow(p2[1]-p1[1],2) + pow(p2[2]-p1[2],2);
-						float distMax = info->inputArrays->floatInputs[0].values[0];
-						//float fade = info->inputArrays->floatInputs[0].values[1];
-						if (sqrdist<distMax)
-						{
-
-							linepos[0][l] = p1[0];
-							linepos[1][l] = p1[1];
-							linepos[2][l] = p1[2];
-							linepos[3][l] = p2[0];
-							linepos[4][l] = p2[1];
-							linepos[5][l] = p2[2];
-							//linepos[5][l] = sqrdist;
-							linepos[6][l] = sqrdist;
-							l++;
-						}
-					}
+					linepos[OUT_TX1][l] = p1[0];
+					linepos[OUT_TY1][l] = p1[1];
+					linepos[OUT_TZ1][l] = p1[2];
+					linepos[OUT_TX2][l] = p2[0];
+					linepos[OUT_TY2][l] = p2[1];
+					linepos[OUT_TZ2][l] = p2[2];
+					linepos[OUT_SQRDIST][l] = sqrdist;
+					l++;
 				}
 			}
 		}
@@ -118,25 +118,25 @@ const char*
 
 	switch(index)
 	{
-	case 0:
+	case OUT_TX1:
 		name = "tx1";
 		break;
-	case 1:
+	case OUT_TY1:
 		name = "ty1";
 		break;
-	case 2:
+	case OUT_TZ1:
 		name = "tz1";
 		break;
-	case 3:
+	case OUT_TX2:
 		name = "tx2";
 		break;
-	case 4:
+	case OUT_TY2:
 		name = "ty2";
 		break;
-	case 5:
+	case OUT_TZ2:
 		name = "tz2";
 		break;
-	case 6:
+	case OUT_SQRDIST:
 		name = "sqrdist";
 		break;
 	}
