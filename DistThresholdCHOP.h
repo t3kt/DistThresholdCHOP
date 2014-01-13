@@ -27,8 +27,8 @@ enum
 
 enum
 {
-	SETTING_MAXLINES,
 	SETTING_DISTMAX,
+	SETTING_MAXLINES,
 	SETTING_MAXLINESPERSOURCE
 };
 
@@ -46,6 +46,7 @@ public:
 								const CHOP_InputArrays*,
 								void* reserved);
 private:
+
 	float** linepos;
 
 	int numlines;
