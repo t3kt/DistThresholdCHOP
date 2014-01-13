@@ -136,41 +136,37 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 			}
 		}
 	}
-	else if (info->inputArrays->numCHOPInputs >0)
+	else if (info->inputArrays->numCHOPInputs >= 1)
 	{
-		for (int i = 0; i < input0len; i++)
+		for (int i = 0; i < input0len && numlines < maxLines; i++)
 		{
-			if(numlines<maxLines)
+			float p1[] = {
+				input0.channels[IN_X][i],
+				input0.channels[IN_Y][i],
+				input0.channels[IN_Z][i]
+			};
+
+			for (int j = i+1; j < input0len; j++)
 			{
-				float p1[] = {
-					input0.channels[IN_X][i],
-					input0.channels[IN_Y][i],
-					input0.channels[IN_Z][i]
+				float p2[] = {
+					input0.channels[IN_X][j],
+					input0.channels[IN_Y][j],
+					input0.channels[IN_Z][j]
 				};
 
-				for (int j = i+1; j < input0len; j++)
+				float sqrdist = squareDist(p1, p2);
+				if (sqrdist<distMax)
 				{
-					if(numlines<maxLines)
-					{
-						float p2[] = {
-							input0.channels[IN_X][j],
-							input0.channels[IN_Y][j],
-							input0.channels[IN_Z][j]
-						};
-
-						float sqrdist = squareDist(p1, p2);
-						if (sqrdist<distMax)
-						{
-							linepos[OUT_TX1][numlines] = p1[0];
-							linepos[OUT_TY1][numlines] = p1[1];
-							linepos[OUT_TZ1][numlines] = p1[2];
-							linepos[OUT_TX2][numlines] = p2[0];
-							linepos[OUT_TY2][numlines] = p2[1];
-							linepos[OUT_TZ2][numlines] = p2[2];
-							linepos[OUT_SQRDIST][numlines] = sqrdist;
-							numlines++;
-						}
-					}
+					linepos[OUT_TX1][numlines] = p1[0];
+					linepos[OUT_TY1][numlines] = p1[1];
+					linepos[OUT_TZ1][numlines] = p1[2];
+					linepos[OUT_TX2][numlines] = p2[0];
+					linepos[OUT_TY2][numlines] = p2[1];
+					linepos[OUT_TZ2][numlines] = p2[2];
+					linepos[OUT_SQRDIST][numlines] = sqrdist;
+					numlines++;
+					if(numlines>= maxLines)
+						break;
 				}
 			}
 		}
