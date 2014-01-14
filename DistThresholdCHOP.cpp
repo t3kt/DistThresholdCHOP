@@ -83,6 +83,7 @@ inline float squareDist( float p1[3], float p2[3] )
 bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 {
 	int maxLines = (int)info->inputArrays->floatInputs[SETTING_MAXLINES].values[0];
+	float distMin = info->inputArrays->floatInputs[SETTING_DISTMIN].values[0];
 	float distMax = info->inputArrays->floatInputs[SETTING_DISTMAX].values[0];
 	//float fade = info->inputArrays->floatInputs[0].values[1];
 
@@ -119,7 +120,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 					input1.channels[IN_Z][j]
 				};
 				float sqrdist = squareDist(p1, p2);
-				if (sqrdist<distMax)
+				if (sqrdist<distMax && sqrdist >=distMin)
 				{
 					linepos[OUT_TX1][numlines] = p1[PT_X];
 					linepos[OUT_TY1][numlines] = p1[PT_Y];
@@ -155,7 +156,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 				};
 
 				float sqrdist = squareDist(p1, p2);
-				if (sqrdist<distMax)
+				if (sqrdist<distMax && sqrdist >=distMin)
 				{
 					linepos[OUT_TX1][numlines] = p1[0];
 					linepos[OUT_TY1][numlines] = p1[1];
