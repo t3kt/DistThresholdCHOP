@@ -85,6 +85,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 	int maxLines = (int)info->inputArrays->floatInputs[SETTING_MAXLINES].values[0];
 	float distMin = info->inputArrays->floatInputs[SETTING_DISTMIN].values[0];
 	float distMax = info->inputArrays->floatInputs[SETTING_DISTMAX].values[0];
+	bool useSeparateSource = (bool)info->inputArrays->floatInputs[SETTING_SEPARATESOURCE].values[0];
 	//float fade = info->inputArrays->floatInputs[0].values[1];
 
 	info->numChannels = NUM_OUTS;
@@ -99,7 +100,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 
 	const CHOP_CHOPInput input0 = info->inputArrays->CHOPInputs[0];
 	int input0len = input0.length;
-	if (info->inputArrays->numCHOPInputs >= 2)
+	if (useSeparateSource && info->inputArrays->numCHOPInputs >= 2)
 	{
 		int maxLinesPerSource = (int)info->inputArrays->floatInputs[SETTING_MAXLINESPERSOURCE].values[0];
 		const CHOP_CHOPInput input1 = info->inputArrays->CHOPInputs[1];
