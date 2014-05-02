@@ -71,6 +71,12 @@ const char* DistThresholdCHOP::getChannelName(int index, void* reserved)
 	case OUT_SQRDIST:
 		name = "sqrdist";
 		break;
+	case OUT_INDEX1:
+		name = "index1";
+		break;
+	case OUT_INDEX2:
+		name = "index2";
+		break;
 	}
 	return name;
 }

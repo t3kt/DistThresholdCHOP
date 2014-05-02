@@ -12,6 +12,8 @@ enum
 	OUT_TY2,
 	OUT_TZ2,
 	OUT_SQRDIST,
+	OUT_INDEX1,
+	OUT_INDEX2,
 	NUM_OUTS
 };
 
@@ -31,7 +33,8 @@ public:
 	InputPoint( const float **channels, const int i ) :
 		x(channels[IN_X][i]),
 		y(channels[IN_Y][i]),
-		z(channels[IN_Z][i]) { }
+		z(channels[IN_Z][i]),
+		index(i) { }
 
 	float squareDist( const InputPoint &p2 ) const
 	{
@@ -42,6 +45,7 @@ private:
 	const float x;
 	const float y;
 	const float z;
+	const int index;
 };
 
 class LineSet
@@ -49,8 +53,12 @@ class LineSet
 public:
 	LineSet() :
 		maxLines(-1),
-		numLines(0),
-		buffer(NULL) { }
+		numLines(0)//,
+		//buffer(NULL)
+	{
+		for( int part = 0; part < NUM_OUTS; part++ )
+			partBuffers[part] = NULL;
+	}
 	~LineSet();
 
 	void reset( int max );
@@ -68,6 +76,6 @@ private:
 	int maxLines;
 	int numLines;
 
-	float *buffer;
+	//float *buffer;
 	float *partBuffers[NUM_OUTS];
 };
