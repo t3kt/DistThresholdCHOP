@@ -1,16 +1,8 @@
-#include "CHOP_CPlusPlusBase.h"
+#pragma once
+
+#include "shared.h"
 
 #include "LineSet.h"
-
-enum
-{
-	SETTING_DISTMAX,
-	SETTING_MAXLINES,
-	SETTING_MAXLINESPERSOURCE,
-	SETTING_DISTMIN,
-	SETTING_SEPARATESOURCE,
-	NUM_SETTINGS
-};
 
 class DistThresholdCHOP : public CHOP_CPlusPlusBase
 {
@@ -20,7 +12,10 @@ public:
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo *);
 	virtual bool		getOutputInfo(CHOP_OutputInfo*);
-	virtual const char*	getChannelName(int index, void* reserved);
+	virtual const char*	getChannelName(int index, void* reserved)
+	{
+		return getOutputPartName(index);
+	}
 
 	virtual void		execute(const CHOP_Output*,
 								const CHOP_InputArrays*,
@@ -31,13 +26,7 @@ public:
 										CHOP_InfoCHOPChan *chan);
 private:
 
-	void loadSettings(const CHOP_FloatInput *inputs)
-	{
-		for( int setting = 0; setting < NUM_SETTINGS; setting++ )
-		{
-			settings[setting] = inputs[setting].values[0];
-		}
-	}
+	void loadSettings(const CHOP_FloatInput *inputs);
 
 	LineSet lines;
 

@@ -44,46 +44,12 @@ void DistThresholdCHOP::getGeneralInfo(CHOP_GeneralInfo *ginfo)
 	ginfo->inputMatchIndex = 0;
 }
 
-const char* DistThresholdCHOP::getChannelName(int index, void* reserved)
+void DistThresholdCHOP::loadSettings( const CHOP_FloatInput *inputs )
 {
-	const char* name = "";
-
-	switch(index)
+	for( int setting = 0; setting < NUM_SETTINGS; setting++ )
 	{
-	case OUT_TX1:
-		name = "tx1";
-		break;
-	case OUT_TY1:
-		name = "ty1";
-		break;
-	case OUT_TZ1:
-		name = "tz1";
-		break;
-	case OUT_TX2:
-		name = "tx2";
-		break;
-	case OUT_TY2:
-		name = "ty2";
-		break;
-	case OUT_TZ2:
-		name = "tz2";
-		break;
-	case OUT_SQRDIST:
-		name = "sqrdist";
-		break;
-	case OUT_INDEX1:
-		name = "index1";
-		break;
-	case OUT_INDEX2:
-		name = "index2";
-		break;
+		settings[setting] = inputs[setting].values[0];
 	}
-	return name;
-}
-
-inline float getSetting( const CHOP_OutputInfo *info, const int setting )
-{
-	return info->inputArrays->floatInputs[setting].values[0];
 }
 
 bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)

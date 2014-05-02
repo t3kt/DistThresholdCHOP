@@ -2,8 +2,6 @@
 
 LineSet::~LineSet()
 {
-	//if( buffer != NULL )
-	//	free( buffer );
 	for( int part = 0; part < NUM_OUTS; part++ )
 		free( partBuffers[part] );
 }
@@ -17,11 +15,7 @@ void LineSet::reset( int max )
 	// the first time this is called, buffer == NULL, so this is just like malloc()
 	if( max != maxLines )
 	{
-		//buffer = (float*)realloc(buffer, max * NUM_OUTS * sizeof(float));
 		maxLines = max;
-		//partBuffers[OUT_TX1] = &buffer[max * OUT_TX1];
-		//for( int part = 0; part < NUM_OUTS; part++ )
-		//	partBuffers[part] = &buffer[max * part];
 
 		for( int part = 0; part < NUM_OUTS; part++ )
 		{
@@ -41,8 +35,10 @@ bool LineSet::addLine( const InputPoint p1, const InputPoint p2, const float sqr
 	partBuffers[OUT_TY2][numLines] = p2.y;
 	partBuffers[OUT_TZ2][numLines] = p2.z;
 	partBuffers[OUT_SQRDIST][numLines] = sqrDist;
+#ifdef INCLUDE_INDEX_OUTPUTS
 	partBuffers[OUT_INDEX1][numLines] = (float)p1.index;
 	partBuffers[OUT_INDEX2][numLines] = (float)p2.index;
+#endif
 	numLines++;
 	return true;
 }

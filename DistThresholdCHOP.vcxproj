@@ -147,10 +147,13 @@
   <ItemGroup>
     <ClInclude Include="CHOP_CPlusPlusBase.h" />
     <ClInclude Include="DistThresholdCHOP.h" />
+    <ClInclude Include="InputPoint.h" />
     <ClInclude Include="LineSet.h" />
+    <ClInclude Include="shared.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DistThresholdCHOP.cpp" />
+    <ClCompile Include="InputPoint.cpp" />
     <ClCompile Include="LineSet.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
