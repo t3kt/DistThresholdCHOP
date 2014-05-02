@@ -1,29 +1,6 @@
 #include "CHOP_CPlusPlusBase.h"
 
-enum
-{
-	OUT_TX1,
-	OUT_TY1,
-	OUT_TZ1,
-	OUT_TX2,
-	OUT_TY2,
-	OUT_TZ2,
-	OUT_SQRDIST,
-	NUM_OUTS
-};
-
-enum
-{
-	IN_X,
-	IN_Y,
-	IN_Z
-};
-enum
-{
-	PT_X,
-	PT_Y,
-	PT_Z
-};
+#include "LineSet.h"
 
 enum
 {
@@ -31,13 +8,14 @@ enum
 	SETTING_MAXLINES,
 	SETTING_MAXLINESPERSOURCE,
 	SETTING_DISTMIN,
-	SETTING_SEPARATESOURCE
+	SETTING_SEPARATESOURCE,
+	NUM_SETTINGS
 };
 
 class DistThresholdCHOP : public CHOP_CPlusPlusBase
 {
 public:
-	DistThresholdCHOP(const CHOP_NodeInfo *info) { }
+	DistThresholdCHOP(const CHOP_NodeInfo *info) : lines() { }
 	virtual ~DistThresholdCHOP() { }
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo *);
@@ -47,9 +25,22 @@ public:
 	virtual void		execute(const CHOP_Output*,
 								const CHOP_InputArrays*,
 								void* reserved);
+
+	virtual int			getNumInfoCHOPChans();
+	virtual void		getInfoCHOPChan(int index,
+										CHOP_InfoCHOPChan *chan);
 private:
 
-	float** linepos;
+	void loadSettings(const CHOP_FloatInput *inputs)
+	{
+		for( int setting = 0; setting < NUM_SETTINGS; setting++ )
+		{
+			settings[setting] = inputs[setting].values[0];
+		}
+	}
 
-	int numlines;
+	LineSet lines;
+
+	float settings[NUM_SETTINGS];
 };
+
