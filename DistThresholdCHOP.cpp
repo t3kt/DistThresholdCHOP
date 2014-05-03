@@ -54,6 +54,12 @@ void DistThresholdCHOP::loadSettings( const CHOP_FloatInput *inputs )
 
 bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 {
+	if( info->numChannels == 0 || info->length == 0 )
+	{
+		info->numChannels = 0;
+		info->length = 0;
+		return true;
+	}
 	info->numChannels = NUM_OUTS;
 	loadSettings(info->inputArrays->floatInputs);
 	const int maxLines = (int)settings[SETTING_MAXLINES];
@@ -116,7 +122,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 
 void DistThresholdCHOP::execute(const CHOP_Output* output, const CHOP_InputArrays* inputs, void* reserved)
 {
-	if (inputs->numCHOPInputs > 0)
+	if (inputs->numCHOPInputs > 0 && inputs->CHOPInputs[0].length > 0 && inputs->CHOPInputs[0].numChannels > 0)
 	{
 		if( lines.getNumLines() > 0 )
 			lines.copyTo(output);
