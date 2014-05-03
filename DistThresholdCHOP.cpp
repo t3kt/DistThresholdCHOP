@@ -56,9 +56,7 @@ bool DistThresholdCHOP::getOutputInfo(CHOP_OutputInfo *info)
 {
 	if( info->numChannels == 0 || info->length == 0 )
 	{
-		info->numChannels = 0;
-		info->length = 0;
-		return true;
+		return false;
 	}
 	info->numChannels = NUM_OUTS;
 	loadSettings(info->inputArrays->floatInputs);
